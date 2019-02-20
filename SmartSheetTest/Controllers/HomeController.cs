@@ -12,8 +12,8 @@ namespace SmartSheetTest.Controllers
 {
     public class HomeController : Controller
     {
-        long sheetid = 3750926323345284;
-        string token = "ikow2tj0gtan8l5vha5vsyadzu";
+        long sheetid = 0;
+        string token = "secret";
 
         public ActionResult Index()
         {
