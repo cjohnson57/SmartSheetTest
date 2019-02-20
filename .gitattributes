@@ -255,4 +255,4 @@ Procfile    text
 *.pyc binary
 
 packages/* linguist-vendored
-PDFApplication/Scripts/* linguist-vendored
+SmartSheetTest/Scripts/* linguist-vendored
