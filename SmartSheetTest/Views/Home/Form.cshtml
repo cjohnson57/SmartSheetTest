@@ -1,0 +1,25 @@
+﻿@model SmartSheetTest.Models.ErrorReport
+@{
+    ViewBag.Title = "Contact";
+}
+
+@using (Html.BeginForm("Form", "Home", FormMethod.Post, new
+{ enctype = "multipart/form-data" }))
+{
+    <input type="submit" value="Submit" />
+    <br />
+    <br />
+    @Html.TextBoxFor(model => model.guid)
+    <br />
+    <br />
+    @Html.TextBoxFor(model => model.timestamp)
+    <br />
+    <br />
+    @Html.TextBoxFor(model => model.errormessage)
+    <br />
+    <br />
+    @Html.TextAreaFor(model => model.usermessage)
+    <br />
+    <br />
+    @Html.TextBoxFor(model => model.file, new { type = "file" })
+}
