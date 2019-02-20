@@ -13,7 +13,7 @@ namespace SmartSheetTest.Controllers
     public class HomeController : Controller
     {
         long sheetid = 0;
-        string token = "secret";
+        string token = "";
 
         public ActionResult Index()
         {
@@ -70,7 +70,7 @@ namespace SmartSheetTest.Controllers
                 new Cell
                 {
                     ColumnId = cols.Data.First(x => x.Title == "User Message").Id,
-                    Value = er.usermessage
+                    Value = string.IsNullOrEmpty(er.usermessage) ? "" : er.usermessage
                 },
             };
             r.Cells = cells;
@@ -78,7 +78,7 @@ namespace SmartSheetTest.Controllers
             sheeit.SheetResources.RowResources.AddRows(sheetid, new Row[] { r });
             Sheet sheet = sheeit.SheetResources.GetSheet(sheetid, null, null, null, null, null, null, null);
             var row = sheet.Rows.OrderByDescending(x => x.CreatedAt).First();
-            if (er.file.ContentLength > 0)
+            if (er.file != null && er.file.ContentLength > 0)
             {
                 var fileName = Path.GetFileName(er.file.FileName);
                 var path = Path.Combine(Server.MapPath("~/App_Data/"), DateTime.Now.ToString("HH-mm-ss") + "-" + fileName);
