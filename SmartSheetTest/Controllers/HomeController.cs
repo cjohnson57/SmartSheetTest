@@ -25,6 +25,7 @@ namespace SmartSheetTest.Controllers
             ErrorReport er = new ErrorReport();
             try
             {
+                //Intentionally cause error
                 int zero = 0;
                 int a = 10 / zero;
             }
@@ -46,12 +47,14 @@ namespace SmartSheetTest.Controllers
 
         public void AddErrorReportToSmartSheet(ErrorReport er)
         {
-            SmartsheetClient sheeit = new SmartsheetBuilder().SetAccessToken(token).Build();
+            //Accesses smartsheet account
+            SmartsheetClient sheetclient = new SmartsheetBuilder().SetAccessToken(token).Build();
             Row r = new Row();
-            r.ToBottom = true;
-            PaginatedResult<Column> cols = sheeit.SheetResources.ColumnResources.ListColumns(sheetid, null, null);
+            r.ToBottom = true; //Makes it so row will be added below all others
+            PaginatedResult<Column> cols = sheetclient.SheetResources.ColumnResources.ListColumns(sheetid, null, null);
             Cell[] cells = new Cell[]
             {
+                //Each cell uses a LINQ query to find the id for the column it should go to
                 new Cell
                 {
                     ColumnId = cols.Data.First(x => x.Title == "ID").Id,
@@ -70,24 +73,22 @@ namespace SmartSheetTest.Controllers
                 new Cell
                 {
                     ColumnId = cols.Data.First(x => x.Title == "User Message").Id,
-                    Value = string.IsNullOrEmpty(er.usermessage) ? "" : er.usermessage
+                    Value = string.IsNullOrEmpty(er.usermessage) ? "" : er.usermessage //Ternary for if user did not input anything for message
                 },
             };
-            r.Cells = cells;
-            
-            sheeit.SheetResources.RowResources.AddRows(sheetid, new Row[] { r });
-            Sheet sheet = sheeit.SheetResources.GetSheet(sheetid, null, null, null, null, null, null, null);
-            var row = sheet.Rows.OrderByDescending(x => x.CreatedAt).First();
+            r.Cells = cells; //Adds cells to the row
+            sheetclient.SheetResources.RowResources.AddRows(sheetid, new Row[] { r }); //Adds row to the sheet
+            //If user attached an image
             if (er.file != null && er.file.ContentLength > 0)
             {
-                var fileName = Path.GetFileName(er.file.FileName);
-                var path = Path.Combine(Server.MapPath("~/App_Data/"), DateTime.Now.ToString("HH-mm-ss") + "-" + fileName);
-                er.file.SaveAs(path);
-                Attachment attachment = sheeit.SheetResources.RowResources.AttachmentResources.AttachFile(sheetid, (long)row.Id, path, "application/jpg");
-                System.IO.File.Delete(path);
-            }
-
-            
+                Sheet sheet = sheetclient.SheetResources.GetSheet(sheetid, null, null, null, null, null, null, null); //Gets the sheet id
+                Row row = sheet.Rows.OrderByDescending(x => x.CreatedAt).First(); //Gets the last row in the sheet, the one just added
+                string fileName = Path.GetFileName(er.file.FileName);
+                string path = Path.Combine(Server.MapPath("~/App_Data/"), DateTime.Now.ToString("HH-mm-ss") + "-" + fileName);
+                er.file.SaveAs(path); //Saves the image onto the server briefly
+                Attachment attachment = sheetclient.SheetResources.RowResources.AttachmentResources.AttachFile(sheetid, (long)row.Id, path, "application/jpg"); //Attaches image to row
+                System.IO.File.Delete(path); //Deletes image from server
+            }         
         }
     }
 }
