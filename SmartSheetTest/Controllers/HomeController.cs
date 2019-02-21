@@ -31,7 +31,6 @@ namespace SmartSheetTest.Controllers
             }
             catch (Exception e)
             {
-                er.guid = Guid.NewGuid();
                 er.timestamp = DateTime.Now;
                 er.errormessage = e.ToString();
             }
@@ -52,27 +51,43 @@ namespace SmartSheetTest.Controllers
             Row r = new Row();
             r.ToBottom = true; //Makes it so row will be added below all others
             PaginatedResult<Column> cols = sheetclient.SheetResources.ColumnResources.ListColumns(sheetid, null, null);
+            //Following ten lines are to grab the previous row's id and increment it by one to use for this id
+            int id = -1; //0 default if tryparse fails
+            try
+            {
+                Sheet sheet = sheetclient.SheetResources.GetSheet(sheetid, null, null, null, null, null, null, null); //Gets the sheet id
+                Row row = sheet.Rows.OrderByDescending(x => x.CreatedAt).First(); //Gets the last row in the sheet, the one most recently added
+                long IDColumnId = (long)cols.Data.First(x => x.Title == "ID").Id;
+                int.TryParse(row.Cells.First(x => x.ColumnId == IDColumnId).Value.ToString(), out id);
+            }
+            catch { }
+            string incrementedid = (id + 1).ToString();
             Cell[] cells = new Cell[]
             {
                 //Each cell uses a LINQ query to find the id for the column it should go to
                 new Cell
                 {
                     ColumnId = cols.Data.First(x => x.Title == "ID").Id,
-                    Value = er.guid
+                    Value = incrementedid
                 },
                 new Cell
                 {
-                    ColumnId = cols.Data.First(x => x.Title == "TimeStamp").Id,
+                    ColumnId = cols.Data.First(x => x.Title == "Date").Id,
                     Value = er.timestamp
                 },
                 new Cell
                 {
-                    ColumnId = cols.Data.First(x => x.Title == "Exception Message").Id,
+                    ColumnId = cols.Data.First(x => x.Title == "User Name").Id,
+                    Value = "Test User"
+                },
+                new Cell
+                {
+                    ColumnId = cols.Data.First(x => x.Title == "Error Message").Id,
                     Value = er.errormessage
                 },
                 new Cell
                 {
-                    ColumnId = cols.Data.First(x => x.Title == "User Message").Id,
+                    ColumnId = cols.Data.First(x => x.Title == "Description").Id,
                     Value = string.IsNullOrEmpty(er.usermessage) ? "" : er.usermessage //Ternary for if user did not input anything for message
                 },
             };
