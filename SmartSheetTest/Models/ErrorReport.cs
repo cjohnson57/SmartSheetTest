@@ -7,9 +7,15 @@ namespace SmartSheetTest.Models
 {
     public class ErrorReport
     {
-        public DateTime timestamp { get; set; }
-        public string errormessage { get; set; }
-        public string usermessage { get; set; }
+        public int ID { get; set; }
+        public DateTime Date { get; set; }
+        public string UserName { get; set; }
+        public string ErrorMessage { get; set; }
+        public string Enhancement { get; set; }
+        public string Description { get; set; }
+        public string Category { get; set; }
+        public string Status { get; set; }
+        public DateTime Modified { get; set; }
         public HttpPostedFileBase file { get; set; }
     }
 }

@@ -1,3 +1,36 @@
-﻿@{
+﻿@using SmartSheetTest.Models;
+@model IList<ErrorReport>
+@{
     ViewBag.Title = "Home Page";
 }
+
+<table class="table-bordered table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Username</th>
+        <th>Error Message</th>
+        <th>Enhancement</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Modified</th>
+    </tr>
+
+    @foreach (ErrorReport e in Model)
+    {
+    <tr>
+        <td>@e.ID</td>
+        <td>@e.Date</td>
+        <td>@e.UserName</td>
+        <td>@e.ErrorMessage</td>
+        <td>@e.Enhancement</td>
+        <td>@e.Description</td>
+        <td>@e.Category</td>
+        <td>@e.Status</td>
+        <td>@e.Modified</td>
+
+    </tr>
+    }
+
+</table>
